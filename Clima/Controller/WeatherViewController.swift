@@ -15,6 +15,8 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
+    var manageWeaather = ManageWeather()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -22,6 +24,8 @@ class WeatherViewController: UIViewController {
     }
 
     @IBAction func searchPressed(_ sender: UIButton) {
+        print(searchTextField.text!)
+        manageWeaather.setURL(cityName: searchTextField.text!)
         searchTextField.endEditing(true)
     }
     
