@@ -8,47 +8,64 @@
 
 import Foundation
 
+protocol ManageWeatherDelegate {
+    func didupdated(_ weatherModel: WeatherModel)
+}
+
 struct ManageWeather {
     
-    func setURL(cityName: String) {
-        let apiKey = "e55a720a086ffbb6d1fdd011f4f2e175"
-        
-        //api.openweathermap.org/data/2.5/weather?q={city name}&appid={your api key}
-        let rawURL = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=\(apiKey)"
-        print(rawURL)
-        requestWeatherData(rawURL)
+    var delegate: ManageWeatherDelegate?
+    
+    
+    func getURL(_ url: String) {
+        let cityName = url
+        let key = "e55a720a086ffbb6d1fdd011f4f2e175"
+        let url = "https://api.openweathermap.org/data/2.5/weather?q=\(cityName)&appid=\(key)&units=metric"
+        print(url)
+        requestQuery(url)
     }
     
-    func requestWeatherData(_ url: String) {
+    func requestQuery(_ url: String) {
         if let url = URL(string: url) {
             let session = URLSession(configuration: .default)
             let sessionTask = session.dataTask(with: url) { (data, response, error) in
                 if error != nil {
-                    print("Data Receve Fail")
+                    print("Data receve Fail")
                     return
                 }
-                if let safeData = data {
-                    let parsedData = self.parseJSON(data: safeData)
-                    print(parsedData)
+                
+                if let responseData = data {
+                    if let parseData = self.parseJSON(responseData) {
+                        self.delegate?.didupdated(parseData)
+                        
+                    }
                 }
             }
             sessionTask.resume()
         }
     }
     
-    func parseJSON(data: Data) -> String{
+    func parseJSON(_ data: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         do {
-            let decordedData = try decoder.decode(WeatherData.self, from: data)
-            print(decordedData)
-            let name = decordedData.name
-            return name
+            let parse = try decoder.decode(WeatherData.self, from: data)
+            let name = parse.name
+            let temp = parse.main.temp
+            let weatherID = parse.weatherID[0].id
+            let weatherModel = WeatherModel(name: name, temp: temp, weatherID: weatherID)
+            
+            return weatherModel
+            
         } catch {
-            let error = "Error"
-            return error
+            print(error)
+            
+            return nil
         }
-        
-        
     }
+    
+    func getData(with url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+        URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
+    }
+   
     
 }
