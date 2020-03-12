@@ -11,7 +11,7 @@ import Foundation
 struct WeatherData: Codable {
     let name: String
     let main: Main
-    let weatherID: [Weather]
+    let weather: [Weather]
 }
 
 struct Main: Codable {
@@ -20,4 +20,5 @@ struct Main: Codable {
 
 struct Weather: Codable {
     let id: Int
+    let main: String
 }

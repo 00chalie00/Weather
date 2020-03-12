@@ -14,8 +14,6 @@ struct WeatherModel {
     let temp: Double
     let weatherID: Int
     
-    //http://openweathermap.org/img/wn/10d@2x.png
-    
     var weatherIconURL: String {
         let iconURL = "http://openweathermap.org/img/wn/\(weatherIconName).png"
         return iconURL
@@ -35,7 +33,7 @@ struct WeatherModel {
             return "09d"
         case 600...622:
             return "13d"
-        case 700...781:
+        case 701...781:
             return "50d"
         case 800...800:
             return "01d"

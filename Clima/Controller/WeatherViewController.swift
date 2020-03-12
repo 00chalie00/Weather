@@ -66,17 +66,18 @@ extension WeatherViewController: UITextFieldDelegate {
 //MARK: - ManageWeatherDelegate
 
 extension WeatherViewController: ManageWeatherDelegate {
+    func receveImage(_ image: UIImage) {
+        DispatchQueue.main.async {
+            //self.weatherIMG.contentMode = .scaleAspectFit
+            self.weatherIMG.image = image
+        }
+    }
     
     func didupdated(_ weatherModel: WeatherModel) {
         DispatchQueue.main.async {
             let rawData = weatherModel
             self.temperatureLbl.text = String(format: "%.1f", rawData.temp)
             self.cityLbl.text = rawData.name
-            
-            let weatherIconURL = weatherModel.weatherIconURL
-            self.weatherIMG.image = UIImage(data: <#T##Data#>)
-            
         }
-        
     }
 }
