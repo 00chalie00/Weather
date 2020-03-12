@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class WeatherViewController: UIViewController {
     
@@ -16,6 +17,10 @@ class WeatherViewController: UIViewController {
     @IBOutlet weak var cityLbl: UILabel!
     
     var manageWeather = ManageWeather()
+    let locationManager = CLLocationManager()
+    
+    var currentLat: CLLocationDegrees?
+    var currentLon: CLLocationDegrees?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,11 +28,42 @@ class WeatherViewController: UIViewController {
         searchTxtField.delegate = self
         manageWeather.delegate = self
         
+        //현재 위치 사용 시 권한 및 delegate
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+        
     }
-    
     
     @IBAction func searchBtnPressed(_ sender: UIButton) {
         searchTxtField.endEditing(true)
+    }
+    
+    
+    @IBAction func loactionBtnPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+        
+        performSegue(withIdentifier: "gotoMapVC", sender: nil)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "gotoMapVC" {
+            //Transper CityName, Temperature, WeatherUI
+            let desVC = segue.destination as! MapViewController
+            if let city = cityLbl.text {
+                desVC.cityTxt = city
+            }
+            if let temp = temperatureLbl.text {
+                desVC.tempTxt = temp
+            }
+            if let image = weatherIMG.image {
+                desVC.weatherUI = image
+            }
+            
+            //Transper GPS Data
+            desVC.lat = currentLat
+            desVC.lon = currentLon
+        }
     }
     
     
@@ -79,5 +115,24 @@ extension WeatherViewController: ManageWeatherDelegate {
             self.temperatureLbl.text = String(format: "%.1f", rawData.temp)
             self.cityLbl.text = rawData.name
         }
+    }
+}
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            locationManager.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            
+            currentLat = lat
+            currentLon = lon
+            
+            manageWeather.updatePosition(lat: lat, lon: lon)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
     }
 }

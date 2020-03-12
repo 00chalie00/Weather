@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 protocol ManageWeatherDelegate {
     func didupdated(_ weatherModel: WeatherModel)
@@ -26,8 +27,16 @@ struct ManageWeather {
         requestQuery(url)
     }
     
+    func updatePosition(lat: CLLocationDegrees, lon: CLLocationDegrees) {
+        //https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22
+        let key = "e55a720a086ffbb6d1fdd011f4f2e175"
+        let url = "https://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=\(key)&units=metric"
+        requestQuery(url)
+    }
+    
     func requestQuery(_ url: String) {
         if let url = URL(string: url) {
+            print(url)
             let session = URLSession(configuration: .default)
             let sessionTask = session.dataTask(with: url) { (data, response, error) in
                 if error != nil {
